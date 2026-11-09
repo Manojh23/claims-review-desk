@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: claims
+      POSTGRES_DB: claims
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set an alphanumeric local database password}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U claims -d claims"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    volumes: [claimsdb:/var/lib/postgresql/data]
+  web:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    ports: ["127.0.0.1:4173:4173"]
+    environment:
+      DATABASE_URL: postgresql://claims:${POSTGRES_PASSWORD}@db:5432/claims
+      REVIEWER_KEY: ${REVIEWER_KEY:?Set a reviewer key}
+      VIEWER_KEY: ${VIEWER_KEY:?Set a viewer key}
+      WORKER_KEY: ${WORKER_KEY:?Set a worker key}
+    healthcheck:
+      test: ["CMD","node","-e","fetch('http://127.0.0.1:4173/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+volumes:
+  claimsdb:

@@ -1,0 +1,1 @@
+{"compilerOptions":{"target":"ES2022","module":"NodeNext","moduleResolution":"NodeNext","strict":true,"jsx":"react-jsx","esModuleInterop":true,"skipLibCheck":true,"lib":["ES2022","DOM","DOM.Iterable"],"noEmit":true},"include":["src","web","tests"]}
